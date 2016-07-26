@@ -1,4 +1,4 @@
-# Centos6.5 Kicckstart
+# Centos6.5 Kickstart
 A guide on how to perform a minimal installation of CentOS using Kickstart configuration files on a server or VM
 
 # HOW TO CONFIGURE AND PERFORM AN AUTOMATED CentOS 6.5 INSTALLATION USING KICKSTART & HTTP SERVER
