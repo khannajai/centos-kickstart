@@ -1,7 +1,8 @@
 # Centos6.5 Kickstart
 A guide on how to perform a minimal installation of CentOS using Kickstart configuration files on a server or VM
 
-# HOW TO CONFIGURE AND PERFORM AN AUTOMATED CentOS 6.5 INSTALLATION USING KICKSTART & HTTP SERVER
+#How to configure and perform an automated CentOS 6.5 installation using Kickstart and HTTP Server
+
 
 Kickstart configuration files are quite convenient because they save us many steps while performing a new installation. A sample Kickstart configuration file called anaconda-ks.cfg is in your /root folder and is built on the configurations chosen at the time of installation of your OS.
 
