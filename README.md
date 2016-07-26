@@ -1,4 +1,4 @@
-# centos-kickstart
+# Centos6.5 Kicckstart
 A guide on how to perform a minimal installation of CentOS using Kickstart configuration files on a server or VM
 
 # HOW TO CONFIGURE AND PERFORM AN AUTOMATED CentOS 6.5 INSTALLATION USING KICKSTART & HTTP SERVER
@@ -12,52 +12,62 @@ I will show you how to set up your host HTTP server with all the files and confi
 In this entire example, I will use the 192.168.162.207 as the IP of the host machine and 192.168.194.2 as the IP of the target machine.
 
 
-# Step 1: Configure Security settings
+## Step 1: Configure Security settings
 
-DISABLE SELINUX 
-Edit the file /etc/selinux/config to set SELINUX=disabled
+###Disable SELinux 
+Edit the file ```/etc/selinux/config``` to set ```SELINUX=disabled```
 
-TURN OFF IPTABLES
-Run the following commands:
-/etc/init.d/iptables save 
+###Turn off iptables
+```
+/etc/init.d/iptables save
 /etc/init.d/iptables stop
 chkconfig -level 35 iptables off
-
+```
 This ensures that the files in your HTTP server will be accessible from another machine.
 
-Step 2: Create your HTTP Server
+## Step 2: Create your HTTP Server
 
-INSTALL HTTPD
+###Install HTTPD
+```
 yum -y install httpd
+```
 
-CONFIGURE HTTPD SERVICE
+###Configure HTTPD Service
+```
 service httpd start
 service httpd status
 chkconfig -level 35 httpd on
-
+```
 Your files for your HTTP server should be stored in /var/www/html/
 
-# Step 3: Setup kickstart and installation files on HTTP server
+## Step 3: Setup kickstart and installation files on HTTP server
 
-DOWNLOAD CENTOS INTO HOME FOLDER:
+###Download CentOS into Home folder
+```
 cd /home
 wget http://192.168.0.127/software/OS/Centos/CentOS-6.5-x86_64-minimal.iso
+```
 
-CREATE CENTOS INSTALLATION TREE FROM DOWNLOADED IMAGE IN HTTP SERVER:
+###Create CentOS installation tree in HTTP server
+```
 mount /home/Centos-6.5-x86_64-minimal.iso /mnt
 mkdir -p /var/www/html/centos
 cp -pvR /mnt/* /var/www/html/centos
+```
 
-CREATE KICKSTART FILE:
+###Create Kickstart File
+```
 vi /var/www/html/rhel.cfg
- or, if you're using a VM 
+```
+ or, if you're using a VM
+```
 vi /var/www/html/rhelvm.cfg
-
+```
 I have already created a minimal rhel.cfg and rhelvm.cfg file, which you can see below. You can also download them from above on my GitHub repository.
-You may have to edit the kickstart file to your specifications. 
-
+You will have to edit the kickstart file to your specifications. 
+```
 ###########################################################################################
-rhel.cfg:
+#rhel.cfg:
 ###########################################################################################
 #version=DEVEL
 install
@@ -86,11 +96,11 @@ autopart
 %packages --nobase
 @core
 %end
+```
 
-
-
+```
 #############################################################################################
-rhelvm.cfg:
+#rhelvm.cfg:
 #############################################################################################
 #version=DEVEL
 install
@@ -117,38 +127,40 @@ autopart
 %packages --nobase
 @core
 %end
+```
 
+## Step 4: Install CentOS6.5 yay!
 
-# Step 4: Install CentOS6.5 yay!
-
-On regular server/machine:
-1. Mount CentOS6.5 minimal ISO as virtual media on management console and reboot machine.
-2. Enter boot menu and select Virtual CDROM
-3. Press ESC and soon you will see a boot prompt that looks like
-
+###On regular server/machine:
+ 1. Mount CentOS6.5 minimal ISO as virtual media on management console and reboot machine.
+ 2. Enter boot menu and select Virtual CDROM
+ 3. Press ESC and soon you will see a boot prompt that looks like
+```
 boot:
-
-4. Enter the following command in the boot prompt and press enter
-
+```
+ 4. Enter the following command in the boot prompt and press enter
+```
 linux ks=http://192.168.162.207/rhel.cfg append ip=192.168.194.2 netmask=255.255.252.0 gateway=192.168.192.1 bootproto=static 
-
+```
 You will have to enter the IP address, netmask and gateway of your target machine even if it is a fresh installation.
 After that you will be prompted for which network interface to connect from, so keep all these details handy.
-4. If all goes well, you will see that your installation is automated.
-5. Reboot your system.
+ 5. If all goes well, you will see that your installation is automated.
+ 6. Reboot your system.
 
 
-On virtual machine:
-1. I'm assuming you have already set up network bridges and installed all packages required for virt-install.
+###On virtual machine:
+ 1. I'm assuming you have already set up network bridges and installed all packages required for virt-install.
    To install your VM, enter the required disk, ram, cpu core, graphics and network parameters according to your requirements and run the following command. 
 
+```
 virt-install --name=VM3 --disk path=/home/vm3/vm3.img,size=190 --vcpus=3 --ram=20000 --os-type=linux --network bridge=br0 --nographics --location=http://192.168.162.207/centos -x "ks=http://192.168.162.207/rhelvm.cfg append ip=192.168.194.2 netmask=255.255.252.0 gateway=192.168.192.1 bootproto=static console=ttyS0,115200"
-2. If all goes well, you will see that your installation is automated.
-2. Reboot your virtual machine.
+```
+ 2. If all goes well, you will see that your installation is automated.
+ 3. Reboot your virtual machine.
 
-YOU NOW HAVE CENTOS6.5 INSTALLED ON YOUR MACHINE.
+##You now have CentOS6.5 installed on your system
 
-Tips for troubleshooting common issues:
+##Tips for troubleshooting common issues:
 Check that you're able to connect to your HTTP server from other machines.
 Make sure you've specified the network details at the boot prompt or the installer won't be able to download the kickstarter file.
 Make sure that the permissions on your kickstart file are set to 755. Also check the SELinux context of both the installation tree folder and kickstarter file.
